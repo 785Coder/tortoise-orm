@@ -256,7 +256,7 @@ def test_dameng_schema_uses_native_field_types() -> None:
         name = fields.CharField(max_length=32)
         payload = fields.TextField()
         active = fields.BooleanField()
-        metadata = fields.JSONField()
+        metadata: fields.JSONField = fields.JSONField()
 
         class Meta:
             app = "models"

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from types import ModuleType
+from typing import cast
+
 import pytest
 
 import tortoise.backends.dameng.client as dameng_client
@@ -97,7 +100,7 @@ def test_dameng_configures_bundled_windows_dll_directories(monkeypatch, tmp_path
     monkeypatch.setattr(dameng_client.sys, "platform", "win32")
     monkeypatch.setenv("PATH", "original")
 
-    _configure_dmpython_runtime_libraries(FakeDmPythonModule())
+    _configure_dmpython_runtime_libraries(cast(ModuleType, FakeDmPythonModule()))
 
     assert dameng_client.os.environ["PATH"].split(dameng_client.os.pathsep)[:1] == [
         str(dmssl_dir.resolve()),
@@ -130,7 +133,7 @@ def test_dameng_configures_linux_shared_library_directories(monkeypatch, tmp_pat
         lambda path, mode: loaded_paths.append((path, mode)),
     )
 
-    _configure_dmpython_runtime_libraries(FakeDmPythonModule())
+    _configure_dmpython_runtime_libraries(cast(ModuleType, FakeDmPythonModule()))
 
     assert dameng_client.os.environ["LD_LIBRARY_PATH"].split(dameng_client.os.pathsep)[:1] == [
         str(dmssl_dir.resolve()),
