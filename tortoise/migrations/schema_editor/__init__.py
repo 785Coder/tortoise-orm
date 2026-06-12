@@ -3,6 +3,7 @@
 from tortoise.migrations.schema_editor.asyncpg import AsyncpgSchemaEditor
 from tortoise.migrations.schema_editor.base import BaseSchemaEditor
 from tortoise.migrations.schema_editor.base_postgres import BasePostgresSchemaEditor
+from tortoise.migrations.schema_editor.dameng import DamengSchemaEditor
 from tortoise.migrations.schema_editor.mssql import MSSQLSchemaEditor
 from tortoise.migrations.schema_editor.mysql import MySQLSchemaEditor
 from tortoise.migrations.schema_editor.oracle import OracleSchemaEditor
@@ -13,6 +14,7 @@ __all__ = [
     "AsyncpgSchemaEditor",
     "BasePostgresSchemaEditor",
     "BaseSchemaEditor",
+    "DamengSchemaEditor",
     "MSSQLSchemaEditor",
     "MySQLSchemaEditor",
     "OracleSchemaEditor",

@@ -10,7 +10,7 @@ Tortoise ORM is an easy-to-use ``asyncio`` ORM *(Object Relational Mapper)* insp
 
 Source & issue trackers are available at `<https://github.com/tortoise/tortoise-orm/>`_
 
-Tortoise ORM supports CPython 3.10 and later for SQLite, MySQL, PostgreSQL, Microsoft SQL Server, and Oracle.
+Tortoise ORM supports CPython 3.10 and later for SQLite, MySQL, PostgreSQL, Microsoft SQL Server, Oracle, and Dameng.
 
 Introduction
 ============
@@ -88,6 +88,7 @@ Tortoise ORM currently supports the following :ref:`databases`:
 * `SQLite` (using ``aiosqlite``)
 * `MySQL`/`MariaDB` (using `asyncmy <https://github.com/long2ice/asyncmy>`_)
 * `Microsoft SQL Server`/`Oracle` (using ``asyncodbc``)
+* `Dameng` (using ``dmpython``)
 
 And more
 --------

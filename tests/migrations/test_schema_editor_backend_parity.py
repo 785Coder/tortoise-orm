@@ -17,6 +17,7 @@ from tortoise.fields.relational import ForeignKeyFieldInstance, ManyToManyRelati
 from tortoise.indexes import Index, PartialIndex
 from tortoise.migrations.schema_editor.base import BaseSchemaEditor
 from tortoise.migrations.schema_editor.base_postgres import BasePostgresSchemaEditor
+from tortoise.migrations.schema_editor.dameng import DamengSchemaEditor
 from tortoise.migrations.schema_editor.mssql import MSSQLSchemaEditor
 from tortoise.migrations.schema_editor.mysql import MySQLSchemaEditor
 from tortoise.migrations.schema_editor.oracle import OracleSchemaEditor
@@ -173,6 +174,12 @@ BACKEND_GENERATORS = [
         "OracleSchemaGenerator",
         {"dialect": "oracle", "inline_comment": False},
     ),
+    (
+        DamengSchemaEditor,
+        BASE_DIR / "tortoise" / "backends" / "dameng" / "schema_generator.py",
+        "DamengSchemaGenerator",
+        {"dialect": "dameng", "inline_comment": False},
+    ),
 ]
 
 
@@ -240,3 +247,40 @@ def test_schema_editor_matches_schema_generator_for_generated_column() -> None:
 
     assert editor_statements == generator_statements
     assert any("GENERATED ALWAYS AS" in stmt for stmt in editor_statements)
+
+
+def test_dameng_schema_uses_native_field_types() -> None:
+    class Widget(Model):
+        id = fields.IntField(pk=True)
+        big_id = fields.BigIntField()
+        name = fields.CharField(max_length=32)
+        payload = fields.TextField()
+        active = fields.BooleanField()
+        metadata = fields.JSONField()
+
+        class Meta:
+            app = "models"
+            table = "widget"
+
+    init_apps(Widget)
+    client = FakeClient(dialect="dameng", inline_comment=False)
+    editor = DamengSchemaEditor(client)
+    generator_cls = load_schema_generator(
+        BASE_DIR / "tortoise" / "backends" / "dameng" / "schema_generator.py",
+        "DamengSchemaGenerator",
+    )
+
+    editor_statements = schema_editor_sql(editor, Widget)
+    generator_statements = schema_generator_sql(generator_cls, client, Widget, (Widget,))
+
+    assert editor_statements == generator_statements
+    assert editor_statements[0] == (
+        'CREATE TABLE "widget" ('
+        ' "id" INT IDENTITY(1,1) NOT NULL PRIMARY KEY,'
+        ' "big_id" BIGINT NOT NULL,'
+        ' "name" VARCHAR(32) NOT NULL,'
+        ' "payload" CLOB NOT NULL,'
+        ' "active" BIT NOT NULL,'
+        ' "metadata" CLOB NOT NULL'
+        " )"
+    )

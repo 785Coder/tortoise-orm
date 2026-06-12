@@ -20,7 +20,7 @@ Tortoise ORM is an easy-to-use ``asyncio`` ORM *(Object Relational Mapper)* insp
 
 You can find the docs at `Documentation <https://tortoise.github.io>`_
 
-Tortoise ORM supports CPython 3.10 and later for SQLite, MySQL, PostgreSQL, Microsoft SQL Server, and Oracle.
+Tortoise ORM supports CPython 3.10 and later for SQLite, MySQL, PostgreSQL, Microsoft SQL Server, Oracle, and Dameng.
 
 Why was Tortoise ORM built?
 ---------------------------
@@ -70,6 +70,8 @@ The following table shows the available installation options for different datab
      - ``pip install tortoise-orm[asyncodbc]``
    * - Oracle
      - ``pip install tortoise-orm[asyncodbc]``
+   * - Dameng
+     - ``pip install tortoise-orm[dameng]``
 
 
 Quick Tutorial
