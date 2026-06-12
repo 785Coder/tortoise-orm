@@ -248,8 +248,61 @@ jobs:
           if-no-files-found: error
           include-hidden-files: true
 
+  test-dameng:
+    runs-on: ubuntu-22.04
+    services:
+      dameng:
+        image: onlyoffice/damengdb:8.1.3
+        ports:
+          - 5236:5236
+        env:
+          PAGE_SIZE: 16
+          LD_LIBRARY_PATH: /opt/dmdbms/bin
+          INSTANCE_NAME: dm8_01
+        options: --privileged
+    env:
+      TORTOISE_TEST_MODULES: tests.testmodels
+      TORTOISE_DAMENG_PASS: SYSDBA_dm001
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: make deps_with_dameng
+      - name: Wait for Dameng
+        run: |
+          for i in {1..60}; do
+            if timeout 1 bash -c "</dev/tcp/127.0.0.1/5236"; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: Test Dameng
+        run: make test_dameng
+        env:
+          PYTHONDEVMODE: 1
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-dameng-${{ matrix.python-version }}
+          path: .coverage
+          if-no-files-found: error
+          include-hidden-files: true
+
   coverage:
-    needs: [test-sqlite, test-postgres, test-mysql, test-mssql]
+    needs: [test-sqlite, test-postgres, test-mysql, test-mssql, test-dameng]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6

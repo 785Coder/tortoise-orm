@@ -365,6 +365,50 @@ def test_mysql_params():
     }
 
 
+def test_dameng_basic():
+    res = expand_db_url("dameng://sysdba:SYSDBA001@127.0.0.1:5237/test")
+    assert res == {
+        "engine": "tortoise.backends.dameng",
+        "credentials": {
+            "database": "test",
+            "host": "127.0.0.1",
+            "password": "SYSDBA001",
+            "port": 5237,
+            "user": "sysdba",
+        },
+    }
+
+
+def test_dameng_no_port():
+    res = expand_db_url("dameng://sysdba:SYSDBA001@127.0.0.1/test")
+    assert res == {
+        "engine": "tortoise.backends.dameng",
+        "credentials": {
+            "database": "test",
+            "host": "127.0.0.1",
+            "password": "SYSDBA001",
+            "port": 5236,
+            "user": "sysdba",
+        },
+    }
+
+
+def test_dameng_params():
+    res = expand_db_url("dameng://sysdba:SYSDBA001@127.0.0.1/test?minsize=2&maxsize=8")
+    assert res == {
+        "engine": "tortoise.backends.dameng",
+        "credentials": {
+            "database": "test",
+            "host": "127.0.0.1",
+            "password": "SYSDBA001",
+            "port": 5236,
+            "user": "sysdba",
+            "minsize": 2,
+            "maxsize": 8,
+        },
+    }
+
+
 def test_generate_config_basic():
     res = generate_config(
         db_url="sqlite:///some/test.sqlite",

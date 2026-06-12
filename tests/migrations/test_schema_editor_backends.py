@@ -10,8 +10,10 @@ from tests.utils.fake_client import FakeClient
 from tortoise import fields
 from tortoise.fields.relational import ForeignKeyFieldInstance
 from tortoise.migrations.constraints import UniqueConstraint
+from tortoise.migrations.executor import MigrationExecutor
 from tortoise.migrations.schema_editor.base import BaseSchemaEditor
 from tortoise.migrations.schema_editor.base_postgres import BasePostgresSchemaEditor
+from tortoise.migrations.schema_editor.dameng import DamengSchemaEditor
 from tortoise.migrations.schema_editor.mssql import MSSQLSchemaEditor
 from tortoise.migrations.schema_editor.mysql import MySQLSchemaEditor
 from tortoise.migrations.schema_generator.state_apps import StateApps
@@ -31,6 +33,13 @@ def init_apps(*models: type[Model]) -> None:
     for model in models:
         apps.register_model("models", model)
     apps._init_relations()
+
+
+def test_migration_executor_uses_dameng_schema_editor() -> None:
+    client = FakeClient("dameng", inline_comment=False, module="tortoise.backends.dameng.client")
+    executor = MigrationExecutor(client, {})
+
+    assert isinstance(executor._schema_editor(), DamengSchemaEditor)
 
 
 # ---------------------------------------------------------------------------
@@ -523,6 +532,7 @@ async def test_random_hex_produces_dialect_specific_sql() -> None:
         "(LOWER(CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(NEWID() AS NVARCHAR(36))), 2)))"
     )
     assert rh.get_sql(dialect="oracle") == "LOWER(RAWTOHEX(SYS_GUID()))"
+    assert rh.get_sql(dialect="dameng") == "LOWER(RAWTOHEX(SYS_GUID()))"
 
 
 # ---------------------------------------------------------------------------

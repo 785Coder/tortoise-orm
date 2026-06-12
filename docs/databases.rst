@@ -10,6 +10,7 @@ Tortoise currently supports the following databases:
 * PostgreSQL >= 9.4 (using ``asyncpg`` or ``psycopg``)
 * MySQL/MariaDB (using ``asyncmy`` or ``aiomysql``)
 * Microsoft SQL Server (using ``asyncodbc``)
+* Dameng (using ``dmpython``)
 
 To use, please ensure that corresponding asyncio driver is installed.
 
@@ -84,6 +85,8 @@ The supported ``DB_TYPE``:
     to the DSN. For example::
 
         mssql://myuser:mypass@db.host:1433/somedb?driver=ODBC%20Driver%2018%20for%20SQL%20Server&encrypt=no&trust_server_certificate=yes
+``dameng``:
+    Typically in the form of :samp:`dameng://myuser:mypass@db.host:5236/someschema`
 
 Capabilities
 ============
@@ -248,6 +251,37 @@ Encoding in Oracle:
 ============
 
 If you get ``???`` values in Varchar fields instead of your actual text (russian/chinese/etc), then set ``NLS_LANG`` variable in your client environment to support UTF8. For example, `"American_America.UTF8"`.
+
+Dameng
+======
+
+DB URL is typically in the form of :samp:`dameng://myuser:mypass@db.host:5236/someschema`.
+
+Required Parameters
+-------------------
+
+``user``:
+    Username to connect with.
+``password``:
+    Password for username.
+``host``:
+    Network host that database is available at.
+``port``:
+    Network port that database is available at. (defaults to ``5236``)
+``database``:
+    Schema to use after connecting.
+
+Optional parameters:
+--------------------
+
+Dameng optional parameters are pass-through parameters to ``dmPython.connect``.
+
+``minsize`` (defaults to ``1``):
+    Minimum connection pool size.
+``maxsize`` (defaults to ``5``):
+    Maximum connection pool size.
+``echo`` (defaults to ``False``):
+    Set to ``True`` to echo SQL queries (debug only).
 
 
 Passing in custom SSL Certificates

@@ -6,6 +6,7 @@ TORTOISE_MYSQL_PASS ?= 123456
 TORTOISE_POSTGRES_PASS ?= 123456
 TORTOISE_MSSQL_PASS ?= 123456
 TORTOISE_ORACLE_PASS ?= 123456
+TORTOISE_DAMENG_PASS ?= SYSDBA_dm001
 
 help:
 	@echo  "Tortoise ORM development makefile"
@@ -28,6 +29,9 @@ deps:
 
 deps_with_asyncmy:
 	uv sync --reinstall-package tortoise-orm --frozen --all-groups --extra asyncpg --extra accel --extra psycopg --extra asyncodbc --extra asyncmy $(options)
+
+deps_with_dameng:
+	uv sync --reinstall-package tortoise-orm --frozen --all-groups --extra asyncpg --extra accel --extra psycopg --extra asyncodbc --extra aiomysql --extra dameng $(options)
 
 check: build _check
 _check:
@@ -88,7 +92,10 @@ test_mssql:
 test_oracle:
 	$(py_warn) TORTOISE_TEST_DB="oracle://SYSTEM:$(TORTOISE_ORACLE_PASS)@127.0.0.1:1521/test_\{\}?driver=$(TORTOISE_ORACLE_DRIVER)" uv run --frozen pytest $(pytest_opts) --cov-report=
 
-_testall: test_sqlite test_postgres_asyncpg test_postgres_psycopg test_mysql_myisam test_mysql test_mysql_asyncmy test_mssql
+test_dameng:
+	$(py_warn) TORTOISE_TEST_DB="dameng://SYSDBA:$(TORTOISE_DAMENG_PASS)@127.0.0.1:5236/test_\{\}" uv run --frozen pytest $(pytest_opts) --cov-report=
+
+_testall: test_sqlite test_postgres_asyncpg test_postgres_psycopg test_mysql_myisam test_mysql test_mysql_asyncmy test_mssql test_dameng
 
 	uv run --frozen coverage report
 

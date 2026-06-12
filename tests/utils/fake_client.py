@@ -10,12 +10,19 @@ from tortoise.backends.base.client import (
 
 class FakeClient(BaseDBAsyncClient):
     def __init__(
-        self, dialect: str, *, inline_comment: bool = True, charset: str | None = None
+        self,
+        dialect: str,
+        *,
+        inline_comment: bool = True,
+        charset: str | None = None,
+        module: str | None = None,
     ) -> None:
         super().__init__("default")
         self.capabilities = Capabilities(dialect, inline_comment=inline_comment)
         self.charset = charset
         self.executed: list[str] = []
+        if module:
+            self.__class__ = type("FakeClient", (self.__class__,), {"__module__": module})
 
     async def create_connection(self, with_db: bool) -> None:
         raise NotImplementedError()

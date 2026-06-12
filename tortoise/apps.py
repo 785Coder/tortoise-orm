@@ -116,6 +116,11 @@ class Apps:
         for app in self.apps.values():
             for model in app.values():
                 model._meta.finalise_model()
+                if model._meta.db.capabilities.dialect == "dameng":
+                    from tortoise.backends.dameng.client import _normalise_model_identifiers
+
+                    _normalise_model_identifiers(model, model._meta.db.query_class)
+                    continue
                 model._meta.basetable = Table(name=model._meta.db_table, schema=model._meta.schema)
                 basequery = model._meta.db.query_class.from_(model._meta.basetable)
                 model._meta.basequery = cast(Query, basequery)

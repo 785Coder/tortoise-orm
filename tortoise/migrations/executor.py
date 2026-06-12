@@ -13,6 +13,7 @@ from tortoise.migrations.schema_editor import (
     AsyncpgSchemaEditor,
     BasePostgresSchemaEditor,
     BaseSchemaEditor,
+    DamengSchemaEditor,
     MSSQLSchemaEditor,
     MySQLSchemaEditor,
     OracleSchemaEditor,
@@ -147,6 +148,8 @@ class MigrationExecutor:
             return MySQLSchemaEditor(self.connection, atomic=atomic, collect_sql=collect_sql)
         if "mssql" in module or "odbc" in module:
             return MSSQLSchemaEditor(self.connection, atomic=atomic, collect_sql=collect_sql)
+        if "dameng" in module or dialect == "dameng":
+            return DamengSchemaEditor(self.connection, atomic=atomic, collect_sql=collect_sql)
         if "oracle" in module:
             return OracleSchemaEditor(self.connection, atomic=atomic, collect_sql=collect_sql)
         if dialect == "postgres":

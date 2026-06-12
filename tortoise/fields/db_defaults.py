@@ -81,6 +81,7 @@ class RandomHex(SqlDefault):
         "mysql": "(LOWER(HEX(RANDOM_BYTES(16))))",
         "mssql": "(LOWER(CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(NEWID() AS NVARCHAR(36))), 2)))",
         "oracle": "LOWER(RAWTOHEX(SYS_GUID()))",
+        "dameng": "LOWER(RAWTOHEX(SYS_GUID()))",
     }
 
     def __init__(self) -> None:
