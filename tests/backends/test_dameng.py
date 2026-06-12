@@ -180,7 +180,9 @@ async def test_dameng_client_executes_via_dmpython(monkeypatch) -> None:
     await client.execute_insert("INSERT INTO USERS (NAME) VALUES (?)", ["beta"])
     await client.execute_many("INSERT INTO USERS (NAME) VALUES (?)", [["a"], ["b"]])
 
-    assert any("INSERT INTO USERS" in query for conn in fake_dm.connections for query, _ in conn.executed)
+    assert any(
+        "INSERT INTO USERS" in query for conn in fake_dm.connections for query, _ in conn.executed
+    )
     assert any(conn.executed_many for conn in fake_dm.connections)
     assert any(conn.commits == 1 for conn in fake_dm.connections)
 

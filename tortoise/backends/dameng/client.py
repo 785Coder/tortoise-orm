@@ -353,7 +353,9 @@ class TransactionWrapper(DamengClient, TransactionalDBClient):
             raise TransactionManagementError("Transaction already finalised")
         if self._savepoint is None:
             raise TransactionManagementError("No savepoint to release")
-        await asyncio.to_thread(_execute, self._connection, f"RELEASE SAVEPOINT {self._savepoint}", None)
+        await asyncio.to_thread(
+            _execute, self._connection, f"RELEASE SAVEPOINT {self._savepoint}", None
+        )
         self._savepoint = None
         self._finalized = True
 
