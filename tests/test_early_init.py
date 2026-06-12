@@ -127,6 +127,7 @@ async def test_early_init():
                 "constraints": {"readOnly": True},
                 "db_field_types": {
                     "": "TIMESTAMP",
+                    "dameng": "TIMESTAMP WITH TIME ZONE",
                     "mssql": "DATETIME2",
                     "mysql": "DATETIME(6)",
                     "postgres": "TIMESTAMPTZ",
@@ -277,6 +278,7 @@ async def test_early_init():
                 "db_column": "created_at",
                 "db_field_types": {
                     "": "TIMESTAMP",
+                    "dameng": "TIMESTAMP WITH TIME ZONE",
                     "mssql": "DATETIME2",
                     "mysql": "DATETIME(6)",
                     "postgres": "TIMESTAMPTZ",

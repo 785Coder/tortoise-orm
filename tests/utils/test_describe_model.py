@@ -1413,6 +1413,7 @@ def test_describe_model_json():
                 "db_column": "data",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1434,6 +1435,7 @@ def test_describe_model_json():
                 "db_column": "data_null",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1455,6 +1457,7 @@ def test_describe_model_json():
                 "db_column": "data_default",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1476,6 +1479,7 @@ def test_describe_model_json():
                 "db_column": "data_validate",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1497,6 +1501,7 @@ def test_describe_model_json():
                 "db_column": "data_pydantic",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1518,6 +1523,7 @@ def test_describe_model_json():
                 "db_default": "__NOT_SET__",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1539,6 +1545,7 @@ def test_describe_model_json():
                 "db_default": "__NOT_SET__",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1598,6 +1605,7 @@ def test_describe_model_json_native():
                 "db_column": "data",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1619,6 +1627,7 @@ def test_describe_model_json_native():
                 "db_column": "data_null",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1640,6 +1649,7 @@ def test_describe_model_json_native():
                 "db_column": "data_default",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1661,6 +1671,7 @@ def test_describe_model_json_native():
                 "db_column": "data_validate",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1682,6 +1693,7 @@ def test_describe_model_json_native():
                 "db_column": "data_pydantic",
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1703,6 +1715,7 @@ def test_describe_model_json_native():
                 "db_default": DB_DEFAULT_NOT_SET,
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
@@ -1724,6 +1737,7 @@ def test_describe_model_json_native():
                 "db_default": DB_DEFAULT_NOT_SET,
                 "db_field_types": {
                     "": "JSON",
+                    "dameng": "CLOB",
                     "mssql": "NVARCHAR(MAX)",
                     "oracle": "NCLOB",
                     "postgres": "JSONB",
