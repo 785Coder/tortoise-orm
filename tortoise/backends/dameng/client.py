@@ -9,9 +9,10 @@ from functools import wraps
 from itertools import count
 from pathlib import Path
 from types import ModuleType
-from typing import Any, SupportsInt, TypeVar
+from typing import Any, SupportsInt, TypeVar, cast
 
-from pypika_tortoise import OracleQuery
+from pypika_tortoise import OracleQuery, Table
+from pypika_tortoise.queries import Query
 
 from tortoise.backends.base.client import (
     BaseDBAsyncClient,
@@ -31,6 +32,7 @@ from tortoise.exceptions import (
     OperationalError,
     TransactionManagementError,
 )
+from tortoise.models import Model
 
 T = TypeVar("T")
 FuncType = Callable[..., Coroutine[None, None, T]]
@@ -515,3 +517,27 @@ def _gen_savepoint_name(_c=count()) -> str:
 
 def _quote(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
+
+
+def _normalise_model_identifiers(
+    model: type[Model], query_class: type[Query] | None = None
+) -> None:
+    meta = model._meta
+    table_name = meta.db_table.upper()
+    field_projection = {
+        field_name: db_column.upper() for field_name, db_column in meta.fields_db_projection.items()
+    }
+    if meta.db_table == table_name and meta.fields_db_projection == field_projection:
+        return
+
+    meta.db_table = table_name
+    meta.fields_db_projection = field_projection
+    meta.finalise_fields()
+    meta.db_pk_column = meta.db_pk_column.upper()
+    meta.generated_db_fields = tuple(column.upper() for column in meta.generated_db_fields)
+    meta.db_default_db_columns = tuple(column.upper() for column in meta.db_default_db_columns)
+    meta.basetable = Table(name=meta.db_table, schema=meta.schema)
+    query_cls = query_class or meta.db.query_class
+    basequery = query_cls.from_(meta.basetable)
+    meta.basequery = cast(Query, basequery)
+    meta.basequery_all_fields = cast(Query, basequery.select(*meta.db_fields))

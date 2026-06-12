@@ -4,12 +4,15 @@ from types import ModuleType
 from typing import cast
 
 import pytest
+from pypika_tortoise import Table
+from pypika_tortoise.queries import Query
 
 import tortoise.backends.dameng.client as dameng_client
 from tortoise import Model, fields
 from tortoise.backends.dameng.client import (
     DamengClient,
     _configure_dmpython_runtime_libraries,
+    _normalise_model_identifiers,
     _split_script_statements,
 )
 from tortoise.backends.dameng.executor import DamengExecutor
@@ -85,6 +88,28 @@ class FakeDmPython:
         connection = FakeConnection()
         self.connections.append(connection)
         return connection
+
+
+class FakeDb:
+    def __init__(self) -> None:
+        self.connection_name = "default"
+        self.query_class = DamengClient.query_class
+        self.scripts: list[str] = []
+        self.inserts: list[tuple[str, list]] = []
+        self.queries: list[str] = []
+
+    async def execute_script(self, query: str) -> None:
+        self.scripts.append(query)
+
+    async def execute_insert(self, query: str, values: list) -> int:
+        self.inserts.append((query, values))
+        return 0
+
+    async def execute_query_dict(
+        self, query: str, values: list | None = None
+    ) -> list[dict[str, int]]:
+        self.queries.append(query)
+        return [{"GLOBAL_IDENTITY": 42}]
 
 
 def test_dameng_configures_bundled_windows_dll_directories(monkeypatch, tmp_path) -> None:
@@ -254,6 +279,30 @@ def test_dameng_script_splitter_ignores_semicolons_in_literals_and_comments() ->
     ]
 
 
+def test_dameng_normalises_model_identifiers_to_uppercase() -> None:
+    class Widget(Model):
+        id = fields.IntField(pk=True)
+        name = fields.CharField(max_length=32)
+
+        class Meta:
+            app = "models"
+            table = "widget"
+
+    _normalise_model_identifiers(Widget, DamengClient.query_class)
+
+    assert Widget._meta.db_table == "WIDGET"
+    assert Widget._meta.fields_db_projection == {"id": "ID", "name": "NAME"}
+    assert Widget._meta.fields_db_projection_reverse == {"ID": "id", "NAME": "name"}
+    assert Widget._meta.db_fields == {"ID", "NAME"}
+    assert Widget._meta.db_pk_column == "ID"
+    assert Widget._meta.generated_db_fields == ("ID",)
+    basequery_sql = str(Widget._meta.basequery_all_fields)
+    assert basequery_sql.startswith("SELECT ")
+    assert '"ID"' in basequery_sql
+    assert '"NAME"' in basequery_sql
+    assert basequery_sql.endswith(' FROM "WIDGET"')
+
+
 @pytest.mark.asyncio
 async def test_dameng_executor_fetches_identity_from_global_identity() -> None:
     class Widget(Model):
@@ -261,20 +310,6 @@ async def test_dameng_executor_fetches_identity_from_global_identity() -> None:
 
         class Meta:
             app = "models"
-
-    class FakeDb:
-        queries: list[str]
-
-        def __init__(self) -> None:
-            self.connection_name = "default"
-            self.query_class = DamengClient.query_class
-            self.queries = []
-
-        async def execute_query_dict(
-            self, query: str, values: list | None = None
-        ) -> list[dict[str, int]]:
-            self.queries.append(query)
-            return [{"GLOBAL_IDENTITY": 42}]
 
     db = FakeDb()
     executor = object.__new__(DamengExecutor)
@@ -286,3 +321,28 @@ async def test_dameng_executor_fetches_identity_from_global_identity() -> None:
 
     assert db.queries == ["SELECT global_identity"]
     assert instance.pk == 42
+
+
+@pytest.mark.asyncio
+async def test_dameng_executor_wraps_custom_generated_pk_with_identity_insert() -> None:
+    class Widget(Model):
+        id = fields.IntField(pk=True)
+        name = fields.CharField(max_length=32)
+
+        class Meta:
+            app = "models"
+            table = "WIDGET"
+
+    db = FakeDb()
+    Widget._meta.db_table = "WIDGET"
+    Widget._meta.fields_db_projection = {"id": "ID", "name": "NAME"}
+    Widget._meta.finalise_fields()
+    Widget._meta.basetable = Table(name=Widget._meta.db_table, schema=Widget._meta.schema)
+    Widget._meta.basequery = cast(Query, db.query_class.from_(Widget._meta.basetable))
+    executor = DamengExecutor(Widget, db)  # type: ignore[arg-type]
+    instance = Widget(id=7, name="custom")
+
+    await executor.execute_insert(instance)
+
+    assert db.scripts == ["SET IDENTITY_INSERT WIDGET ON", "SET IDENTITY_INSERT WIDGET OFF"]
+    assert db.inserts == [('INSERT INTO "WIDGET" ("ID","NAME") VALUES (?,?)', [7, "custom"])]
